@@ -31,8 +31,8 @@ pub enum Error {
     Hrana(crate::BoxError), // Not in rusqlite
     #[error("Write delegation: `{0}`")]
     WriteDelegation(crate::BoxError), // Not in rusqlite
-    #[error("bincode: `{0}`")]
-    Bincode(crate::BoxError),
+    #[error("postcard: `{0}`")]
+    Postcard(crate::BoxError),
     #[error("invalid column index")]
     InvalidColumnIndex,
     #[error("invalid column type")]
@@ -112,15 +112,9 @@ pub fn sqlite_errmsg_to_string(errmsg: *const std::ffi::c_char) -> String {
 }
 
 #[cfg(feature = "replication")]
-impl From<bincode::error::EncodeError> for Error {
-    fn from(e: bincode::error::EncodeError) -> Self {
-        Error::Bincode(e.to_string().into())
-    }
-}
-
 #[cfg(feature = "replication")]
-impl From<bincode::error::DecodeError> for Error {
-    fn from(e: bincode::error::DecodeError) -> Self {
-        Error::Bincode(e.to_string().into())
+impl From<postcard::Error> for Error {
+    fn from(e: postcard::Error) -> Self {
+        Error::Postcard(e.to_string().into())
     }
 }

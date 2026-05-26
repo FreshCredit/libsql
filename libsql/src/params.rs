@@ -289,20 +289,18 @@ impl From<Params> for libsql_replication::rpc::proxy::query::Params {
         match params {
             Params::None => proxy::query::Params::Positional(proxy::Positional::default()),
             Params::Positional(values) => {
-                let config = bincode::config::legacy();
-                let values = values
+                                let values = values
                     .iter()
-                    .map(|v| bincode::serde::encode_to_vec(v, config).unwrap())
+                    .map(|v| postcard::to_allocvec(v).unwrap())
                     .map(|data| proxy::Value { data })
                     .collect::<Vec<_>>();
                 proxy::query::Params::Positional(proxy::Positional { values })
             }
             Params::Named(values) => {
-                let config = bincode::config::legacy();
-                let (names, values) = values
+                                let (names, values) = values
                     .into_iter()
                     .map(|(name, value)| {
-                        let data = bincode::serde::encode_to_vec(&value, config).unwrap();
+                        let data = postcard::to_allocvec(&value).unwrap();
                         let value = proxy::Value { data };
                         (name, value)
                     })

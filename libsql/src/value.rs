@@ -458,8 +458,7 @@ impl TryFrom<&libsql_replication::rpc::proxy::Value> for Value {
             Blob(Vec<u8>),
         }
 
-        let config = bincode::config::legacy();
-        let (decoded, _) = bincode::serde::decode_from_slice::<BincodeValue, _>(&value.data[..], config)
+                let decoded = postcard::from_bytes::<BincodeValue>(&value.data)
             .map_err(Error::from)?;
         Ok(
             match decoded {

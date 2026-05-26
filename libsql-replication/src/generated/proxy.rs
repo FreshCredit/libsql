@@ -166,7 +166,7 @@ pub struct Description {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Value {
-    /// / bincode encoded Value
+    /// / postcard encoded Value
     #[prost(bytes = "vec", tag = "1")]
     pub data: ::prost::alloc::vec::Vec<u8>,
 }
