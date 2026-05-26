@@ -458,8 +458,10 @@ impl TryFrom<&libsql_replication::rpc::proxy::Value> for Value {
             Blob(Vec<u8>),
         }
 
+                let decoded = postcard::from_bytes::<BincodeValue>(&value.data)
+            .map_err(Error::from)?;
         Ok(
-            match bincode::deserialize::<'_, BincodeValue>(&value.data[..]).map_err(Error::from)? {
+            match decoded {
                 BincodeValue::Null => Value::Null,
                 BincodeValue::Integer(i) => Value::Integer(i),
                 BincodeValue::Real(x) => Value::Real(x),
