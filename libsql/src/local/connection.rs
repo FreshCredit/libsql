@@ -107,7 +107,13 @@ impl Connection {
     /// Disconnect from the database.
     pub fn disconnect(&mut self) {
         if Arc::get_mut(&mut self.drop_ref).is_some() {
-            unsafe { libsql_sys::ffi::sqlite3_close_v2(self.raw) };
+            unsafe {
+                libsql_sys::ffi::sqlite3_close_v2(self.raw);
+                // Null the handle so a second disconnect() (e.g. LibsqlConnection's
+                // Drop followed by the inner Connection's Drop) is a harmless
+                // no-op instead of a use-after-free double-close.
+                self.raw = std::ptr::null_mut();
+            };
         }
     }
 
